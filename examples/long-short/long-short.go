@@ -33,8 +33,8 @@ type stockField struct {
 var alpacaClient alpacaClientContainer
 
 func init() {
-	API_KEY := "YOUR_API_KEY_HERE"
-	API_SECRET := "YOUR_API_SECRET_HERE"
+	API_KEY := "PKB69PSBPUGAW4U3S1OA"
+	API_SECRET := "3doHZwMcEtnfQk3lRm1Gbtt3wUNUSgnHDiEvrmyg"
 	BASE_URL := "https://paper-api.alpaca.markets"
 
 	// Check for environment variables
@@ -48,7 +48,7 @@ func init() {
 
 	// Format the allStocks variable for use in the class.
 	allStocks := []stockField{}
-	stockList := []string{"DOMO", "TLRY", "SQ", "MRO", "AAPL", "GM", "SNAP", "SHOP", "SPLK", "BA", "AMZN", "SUI", "SUN", "TSLA", "CGC", "SPWR", "NIO", "CAT", "MSFT", "PANW", "OKTA", "TWTR", "TM", "RTN", "ATVI", "GS", "BAC", "MS", "TWLO", "QCOM"}
+	stockList := []string{"ONTX", "MYOV", "AKTX", "RAD", "ITCI", "LK", "APA", "PGNY", "BBIO", "OGEN", "AKBA", "NIO"}
 	for _, stock := range stockList {
 		allStocks = append(allStocks, stockField{stock, 0})
 	}
@@ -370,6 +370,7 @@ func (alp alpacaClientContainer) getPercentChanges() {
 	for i, stock := range alpacaClient.allStocks {
 		startTime, endTime := time.Unix(time.Now().Unix()-int64(length*60), 0), time.Now()
 		bars, _ := alpacaClient.client.GetSymbolBars(stock.name, alpaca.ListBarParams{Timeframe: "minute", StartDt: &startTime, EndDt: &endTime})
+		fmt.Printf("%s\n", bars[len(bars)-1].Close)
 		percentChange := (bars[len(bars)-1].Close - bars[0].Open) / bars[0].Open
 		alpacaClient.allStocks[i].pc = float64(percentChange)
 	}

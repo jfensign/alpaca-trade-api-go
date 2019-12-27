@@ -11,7 +11,6 @@ import (
 	"strconv"
 	"strings"
 	"time"
-
 	"github.com/alpacahq/alpaca-trade-api-go/common"
 )
 
@@ -19,7 +18,7 @@ var (
 	// DefaultClient is the default Alpaca client using the
 	// environment variable set credentials
 	DefaultClient = NewClient(common.Credentials())
-	base          = "https://api.alpaca.markets/"
+	base          = "https://api.alpaca.markets"
 	dataUrl       = "https://data.alpaca.markets/"
 	apiVersion    = "v2"
 	do            = func(c *Client, req *http.Request) (*http.Response, error) {
@@ -142,6 +141,27 @@ func (c *Client) UpdateAccountConfigurations(newConfigs AccountConfigurationsReq
 	}
 
 	return configs, nil
+}
+
+// EditConfigs patches the account configs
+func (c *Client) GetWatchLists() ([]WatchList, error) {
+	u, err := url.Parse(fmt.Sprintf("%s/%s/watchlists", base, apiVersion))
+	if err != nil {
+		return nil, err
+	}
+
+	resp, err := c.get(u)
+	if err != nil {
+		return nil, err
+	}
+
+	ws := []WatchList{}
+
+	if err = unmarshal(resp, &ws); err != nil {
+		return nil, err
+	}
+
+	return ws, nil
 }
 
 func (c *Client) GetAccountActivities(activityType *string, opts *AccountActivitiesRequest) ([]AccountActvity, error) {

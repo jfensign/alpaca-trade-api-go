@@ -1,6 +1,8 @@
 module github.com/alpacahq/alpaca-trade-api-go
 
 require (
+	github.com/RobinUS2/golang-moving-average v1.0.0 // indirect
+	github.com/VividCortex/ewma v1.1.1
 	github.com/cheekybits/is v0.0.0-20150225183255-68e9c0620927 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/gorilla/websocket v1.4.0
@@ -11,3 +13,5 @@ require (
 	gopkg.in/check.v1 v1.0.0-20180628173108-788fd7840127 // indirect
 	gopkg.in/matryer/try.v1 v1.0.0-20150601225556-312d2599e12e
 )
+
+go 1.13

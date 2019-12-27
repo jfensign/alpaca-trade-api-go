@@ -36,6 +36,13 @@ type HistoricTrades struct {
 	Type      string      `json:"type"`
 }
 
+type DailyOpenClose struct {
+	Symbol string `json:"symbol"`
+	Open float64 `json:"open"`
+	Close float64 `json:"close"`
+	AfterHours float64 `json:"afterHours"`
+}
+
 // TradeTick is the structure that contains the actual
 // tick data included in a HistoricTrades response
 type TradeTick struct {
@@ -100,6 +107,20 @@ type HistoricQuotes struct {
 	Symbol    string      `json:"symbol"`
 	Ticks     []QuoteTick `json:"ticks"`
 	Type      string      `json:"type"`
+}
+
+type SnapShot struct {
+	Status  string `json:"status"`
+	Tickers []struct {
+		Ticker           string `json:"ticker"`
+		Day              AggTick `json:"day"`
+		LastTrade        TradeTick `json:"lastTrade"`
+		LastQuote        QuoteTickV2 `json:"lastQuote"`
+		Min              AggTick `json:"min"`
+		PrevDay          AggTick `json:"prevDay"`
+		TodaysChange     *float64 `json:"todaysChange"`
+		TodaysChangePerc *float64 `json:"todaysChangePerc"`
+	}
 }
 
 // QuoteTick is the structure that contains the actual

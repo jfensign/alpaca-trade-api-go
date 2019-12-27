@@ -16,13 +16,17 @@ import (
 )
 
 const (
-	aggURL      = "%v/v1/historic/agg/%v/%v"
-	aggv2URL    = "%v/v2/aggs/ticker/%v/range/%v/%v/%v/%v"
-	tradesURL   = "%v/v1/historic/trades/%v/%v"
-	tradesv2URL = "%v/v2/ticks/stocks/trades/%v/%v"
-	quotesURL   = "%v/v1/historic/quotes/%v/%v"
-	quotesv2URL = "%v/v2/ticks/stocks/nbbo/%v/%v"
-	exchangeURL = "%v/v1/meta/exchanges"
+	aggURL        = "%v/v1/historic/agg/%v/%v"
+	aggv2URL      = "%v/v2/aggs/ticker/%v/range/%v/%v/%v/%v"
+	aggGroupURL   = "%v/v2/aggs/grouped/locale/us/market/STOCKS/%v"
+	tradesURL     = "%v/v1/historic/trades/%v/%v"
+	tradesv2URL   = "%v/v2/ticks/stocks/trades/%v/%v"
+	quotesURL     = "%v/v1/historic/quotes/%v/%v"
+	quotesv2URL   = "%v/v2/ticks/stocks/nbbo/%v/%v"
+	exchangeURL   = "%v/v1/meta/exchanges"
+	moversURL     = "%v/v2/snapshot/locale/us/markets/stocks/%v"
+	OpenCloseURL  = "%v/v1/open-close/%v/%v"
+	FinancialsURL = "%v/v2/reference/financials/%v"
 )
 
 var (
@@ -221,6 +225,81 @@ func (c *Client) GetHistoricTrades(
 	return totalTrades, nil
 }
 
+func (c *Client) GetOpenClose(ticker string, date string, opts *HistoricTicksV2Params) (*DailyOpenClose, error) {
+	u, err := url.Parse(fmt.Sprintf(OpenCloseURL, base, ticker, date))
+	if err != nil {
+		return nil, err
+	}
+
+	q := u.Query()
+	q.Set("apiKey", c.credentials.ID)
+	q.Set("limit", strconv.FormatInt(10000, 10))
+	u.RawQuery = q.Encode()
+
+	resp, err := c.get(u, opts)
+	if err != nil {
+		return nil, err
+	}
+
+	doc := &DailyOpenClose{}
+
+	if err = unmarshal(resp, doc); err != nil {
+		return nil, err
+	}
+
+	return doc, nil
+}
+
+func (c *Client) GetGainers24H() (*SnapShot, error) {
+	u, err := url.Parse(fmt.Sprintf(moversURL, base, "gainers"))
+	if err != nil {
+		return nil, err
+	}
+
+	q := u.Query()
+	q.Set("apiKey", c.credentials.ID)
+	q.Set("limit", strconv.FormatInt(10000, 10))
+	u.RawQuery = q.Encode()
+
+	resp, err := c.get(u, HistoricTicksV2Params{})
+	if err != nil {
+		return nil, err
+	}
+
+	snapshot := &SnapShot{}
+
+	if err = unmarshal(resp, snapshot); err != nil {
+		return nil, err
+	}
+
+	return snapshot, nil
+}
+
+func (c *Client) GetLosers24H() (*SnapShot, error) {
+	u, err := url.Parse(fmt.Sprintf(moversURL, base, "losers"))
+	if err != nil {
+		return nil, err
+	}
+
+	q := u.Query()
+	q.Set("apiKey", c.credentials.ID)
+	q.Set("limit", strconv.FormatInt(10000, 10))
+    u.RawQuery = q.Encode()
+
+	resp, err := c.get(u, HistoricTicksV2Params{})
+	if err != nil {
+		return nil, err
+	}
+
+	snapshot := &SnapShot{}
+
+	if err = unmarshal(resp, snapshot); err != nil {
+		return nil, err
+	}
+
+	return snapshot, nil
+}
+
 // GetHistoricTradesV2 requests polygon's REST API for historic trades
 // on the provided date.
 func (c *Client) GetHistoricTradesV2(ticker string, date string, opts *HistoricTicksV2Params) (*HistoricTradesV2, error) {
@@ -413,7 +492,6 @@ func verify(resp *http.Response) (err error) {
 		if err != nil {
 			return err
 		}
-		fmt.Println(string(body))
 
 		apiErr := APIError{}
 
